@@ -1,59 +1,32 @@
-import "../styles/globals.css";
-import "@interchain-ui/react/styles";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../styles/globals.css';
+import { ChainProvider } from '@cosmos-kit/react';
+import { wallets as keplrWallets } from '@cosmos-kit/keplr';
+import { AppProps } from 'next/app';
+import React, { useEffect, useState } from 'react';
+import { assets, chains } from 'chain-registry';
 
-import type { AppProps } from "next/app";
-import { SignerOptions, wallets } from "cosmos-kit";
-import { ChainProvider } from "@cosmos-kit/react";
-import { assets, chains } from "chain-registry";
-import {
-  Box,
-  ThemeProvider,
-  useColorModeValue,
-  useTheme,
-} from "@interchain-ui/react";
+const MyApp = ({ Component, pageProps }: AppProps) => {
+  const [loadingWallets, setLoadingWallets] = useState<boolean>(true);
 
-function CreateCosmosApp({ Component, pageProps }: AppProps) {
-  const { themeClass } = useTheme();
+  useEffect(() => {
+    setLoadingWallets(false);
+  }, []);
 
-  const signerOptions: SignerOptions = {
-    // signingStargate: () => {
-    //   return getSigningCosmosClientOptions();
-    // }
-  };
+  if (loadingWallets) {
+    return <>Loading...</>;
+  }
 
   return (
-    <ThemeProvider>
-      <ChainProvider
-        chains={chains}
-        assetLists={assets}
-        wallets={wallets}
-        walletConnectOptions={{
-          signClient: {
-            projectId: "a8510432ebb71e6948cfd6cde54b70f7",
-            relayUrl: "wss://relay.walletconnect.org",
-            metadata: {
-              name: "CosmosKit Template",
-              description: "CosmosKit dapp template",
-              url: "https://docs.cosmology.zone/cosmos-kit/",
-              icons: [],
-            },
-          },
-        }}
-        // @ts-ignore
-        signerOptions={signerOptions}
-      >
-        <Box
-          className={themeClass}
-          minHeight="100dvh"
-          backgroundColor={useColorModeValue("$white", "$background")}
-        >
-          {/* TODO fix type error */}
-          {/* @ts-ignore */}
-          <Component {...pageProps} />
-        </Box>
-      </ChainProvider>
-    </ThemeProvider>
+    <ChainProvider
+      chains={chains}
+      assetLists={assets}
+      wallets={[...keplrWallets]}
+      defaultNameService="stargaze"
+    >
+      <Component {...pageProps} />
+    </ChainProvider>
   );
-}
+};
 
-export default CreateCosmosApp;
+export default MyApp;
