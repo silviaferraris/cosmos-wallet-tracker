@@ -1,4 +1,6 @@
-This is a Cosmos App project bootstrapped with [`create-cosmos-app`](https://github.com/cosmology-tech/create-cosmos-app).
+# Wallet Interaction App
+
+This project is a Cosmos web application that facilitates interaction with the Keplr wallet. It allows users to connect to their Keplr wallet, view their balance with a progress bar based on a maximum value of 100, and send tokens on the Cosmos testnet.
 
 ## Getting Started
 
@@ -6,9 +8,8 @@ First, install the packages and run the development server:
 
 ```bash
 yarn && yarn dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```
 
 You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
 
