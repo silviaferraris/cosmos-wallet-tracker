@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { Button, Snackbar, Typography } from "@mui/material";
-import { useChain } from "@cosmos-kit/react";
-import BigNumber from "bignumber.js";
 import { Asset, AssetList } from "@chain-registry/types";
+import { StdFee } from "@cosmjs/stargate";
+import { useChain, useWalletClient } from "@cosmos-kit/react";
+import { Button, Snackbar, Typography } from "@mui/material";
+import BigNumber from "bignumber.js";
+import { assets } from "chain-registry";
 import { cosmos } from "juno-network";
+import { useEffect, useState } from "react";
 import {
-  Root,
   Card,
-  ProgressBarContainer,
   ProgressBar,
+  ProgressBarContainer,
+  Root,
   TextField,
 } from "../styles/styles";
-import { assets } from "chain-registry";
-import { StdFee } from "@cosmjs/stargate";
 
 const chainName = "cosmoshub";
 
@@ -31,14 +31,25 @@ const WalletInteraction = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [txHash, setTxHash] = useState("");
 
-  const { getSigningStargateClient, address, status, getRpcEndpoint } =
-    useChain(chainName);
+  const {
+    getSigningStargateClient,
+    username,
+    wallet,
+    address,
+    status,
+    getRpcEndpoint,
+    connect,
+    disconnect,
+  } = useChain(chainName);
 
   useEffect(() => {
     if (address) {
       getBalance();
+    } else {
+      setBalance(new BigNumber(0));
+      setErrorMessage("")
     }
-  }, [address]);
+  }, [address, status]);
 
   const getBalance = async () => {
     if (!address) return;
@@ -154,13 +165,39 @@ const WalletInteraction = () => {
               marginBottom: "10px",
             }}
           >
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => setSuccessMessage("")}
-            >
-              Disconnect
-            </Button>
+            {" "}
+            {status === "Connecting" && (
+              <button>{`Connecting ${wallet?.prettyName}`}</button>
+            )}
+            {status === "Connected" ? (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  marginBottom: "10px",
+                }}
+              >
+                <span>Wallet name: {wallet?.prettyName}</span>
+                <span>{username}</span>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={async () => {
+                    await disconnect();
+                  }}
+                >
+                  Disconnect
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => connect()}
+              >
+                Connect Wallet
+              </Button>
+            )}
             <Button variant="contained" color="primary" onClick={sendTokens}>
               Send Tokens
             </Button>
